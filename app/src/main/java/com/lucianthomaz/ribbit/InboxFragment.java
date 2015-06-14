@@ -103,7 +103,6 @@ public class InboxFragment extends ListFragment {
             idsToRemove.add(ParseUser.getCurrentUser().getObjectId());
 
             message.removeAll(ParseConstants.KEY_RECIPIENT_IDS, idsToRemove);
-            message.saveInBackground();
         }
     }
 }
