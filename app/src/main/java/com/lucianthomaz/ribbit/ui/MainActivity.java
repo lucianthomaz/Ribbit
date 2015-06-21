@@ -1,4 +1,4 @@
-package com.lucianthomaz.ribbit;
+package com.lucianthomaz.ribbit.ui;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -17,6 +17,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.lucianthomaz.ribbit.utils.ParseConstants;
+import com.lucianthomaz.ribbit.R;
+import com.lucianthomaz.ribbit.adapters.SectionsPagerAdapter;
 import com.parse.ParseUser;
 
 import java.io.File;
@@ -164,6 +167,9 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setIcon(R.mipmap.ic_launcher);
+
         ParseUser currentUser = ParseUser.getCurrentUser();
         if (currentUser == null){
             navigateToLogin();
@@ -201,7 +207,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
             // this tab is selected.
             actionBar.addTab(
                     actionBar.newTab()
-                            .setText(mSectionsPagerAdapter.getPageTitle(i))
+                            .setIcon(mSectionsPagerAdapter.getIcon(i))
                             .setTabListener(this));
         }
     }

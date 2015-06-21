@@ -1,4 +1,4 @@
-package com.lucianthomaz.ribbit;
+package com.lucianthomaz.ribbit.utils;
 
 import android.content.Context;
 import android.graphics.Bitmap;

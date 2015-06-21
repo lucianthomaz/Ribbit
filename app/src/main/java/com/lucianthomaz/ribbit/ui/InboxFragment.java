@@ -1,4 +1,4 @@
-package com.lucianthomaz.ribbit;
+package com.lucianthomaz.ribbit.ui;
 
 import android.content.Intent;
 import android.net.Uri;
@@ -9,6 +9,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
+import com.lucianthomaz.ribbit.adapters.MessageAdapter;
+import com.lucianthomaz.ribbit.utils.ParseConstants;
+import com.lucianthomaz.ribbit.R;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;

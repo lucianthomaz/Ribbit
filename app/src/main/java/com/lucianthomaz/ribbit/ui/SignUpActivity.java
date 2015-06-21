@@ -1,4 +1,4 @@
-package com.lucianthomaz.ribbit;
+package com.lucianthomaz.ribbit.ui;
 
 import android.app.AlertDialog;
 import android.content.Intent;
@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.lucianthomaz.ribbit.R;
 import com.parse.ParseException;
 import com.parse.ParseUser;
 import com.parse.SignUpCallback;
@@ -20,6 +21,7 @@ public class SignUpActivity extends ActionBarActivity {
     protected EditText mPassword;
     protected EditText mEmail;
     protected Button mSignUpButton;
+    protected Button mCancelButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,8 +34,16 @@ public class SignUpActivity extends ActionBarActivity {
         mUsername = (EditText)findViewById(R.id.usernameField);
         mPassword = (EditText)findViewById(R.id.passwordField);
         mEmail = (EditText)findViewById(R.id.emailField);
-        mSignUpButton = (Button)findViewById(R.id.signUpButton);
 
+        mCancelButton = (Button) findViewById(R.id.cancelButton);
+        mCancelButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+
+        mSignUpButton = (Button)findViewById(R.id.signUpButton);
         mSignUpButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

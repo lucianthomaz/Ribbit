@@ -1,4 +1,4 @@
-package com.lucianthomaz.ribbit;
+package com.lucianthomaz.ribbit.utils;
 
 /**
  * Created by Lucian on 29/04/2015.
