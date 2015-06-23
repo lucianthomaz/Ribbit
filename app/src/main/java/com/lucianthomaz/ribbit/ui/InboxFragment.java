@@ -4,14 +4,15 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
+import com.lucianthomaz.ribbit.R;
 import com.lucianthomaz.ribbit.adapters.MessageAdapter;
 import com.lucianthomaz.ribbit.utils.ParseConstants;
-import com.lucianthomaz.ribbit.R;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
@@ -28,11 +29,22 @@ import java.util.List;
 public class InboxFragment extends ListFragment {
 
     protected List<ParseObject> mMessages;
+    protected SwipeRefreshLayout mSwipeRefreshLayout;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_inbox, container, false);
+
+        mSwipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipeRefreshLayout);
+        mSwipeRefreshLayout.setOnRefreshListener(mOnRefreshListener);
+        mSwipeRefreshLayout.setColorSchemeColors(
+                R.color.swipeRefresh1,
+                R.color.swipeRefresh2,
+                R.color.swipeRefresh3,
+                R.color.swipeRefresh4
+        );
+
         return rootView;
     }
 
@@ -40,12 +52,20 @@ public class InboxFragment extends ListFragment {
     public void onResume() {
         super.onResume();
 
+        retrieveMessages();
+    }
+
+    private void retrieveMessages() {
         ParseQuery<ParseObject> query = new ParseQuery<ParseObject>(ParseConstants.CLASS_MESSAGES);
         query.whereEqualTo(ParseConstants.KEY_RECIPIENT_IDS, ParseUser.getCurrentUser().getObjectId());
         query.addDescendingOrder(ParseConstants.KEY_CREATED_AT);
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(List<ParseObject> messages, ParseException e) {
+                if (mSwipeRefreshLayout.isRefreshing()) {
+                    mSwipeRefreshLayout.setRefreshing(false);
+                }
+
                 if (e == null) {
                     // we found messages!
                     mMessages = messages;
@@ -108,4 +128,11 @@ public class InboxFragment extends ListFragment {
             message.removeAll(ParseConstants.KEY_RECIPIENT_IDS, idsToRemove);
         }
     }
+
+    protected SwipeRefreshLayout.OnRefreshListener mOnRefreshListener = new SwipeRefreshLayout.OnRefreshListener() {
+        @Override
+        public void onRefresh() {
+            retrieveMessages();
+        }
+    };
 }
