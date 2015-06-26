@@ -1,19 +1,23 @@
 package com.lucianthomaz.ribbit.ui;
 
 import android.app.AlertDialog;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
+import android.widget.GridView;
 import android.widget.HeaderViewListAdapter;
+import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 
-import com.lucianthomaz.ribbit.utils.ParseConstants;
 import com.lucianthomaz.ribbit.R;
+import com.lucianthomaz.ribbit.adapters.UserAdapter;
+import com.lucianthomaz.ribbit.utils.ParseConstants;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
@@ -31,33 +35,20 @@ public class EditFriendsActivity extends ActionBarActivity {
     protected List<ParseUser> mUsers;
     protected ParseRelation<ParseUser> mFriendsRelation;
     protected ParseUser mCurrentUser;
+    protected GridView mGridView;
 
     private ListView mListView;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_edit_friends);
+        setContentView(R.layout.user_grid);
 
-        getListView().setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
-        getListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if (getListView().isItemChecked(position)) {
-                    //add friend
-                    mFriendsRelation.add(mUsers.get(position));
-                } else  {
-                    //remove friend
-                    mFriendsRelation.remove(mUsers.get(position));
-                }
-                mCurrentUser.saveInBackground(new SaveCallback() {
-                    @Override
-                    public void done(ParseException e) {
-                        if (e == null ) {}
-                    }
-                });
+        mGridView = (GridView) findViewById(R.id.friendsGrid);
+        mGridView.setChoiceMode(GridView.CHOICE_MODE_MULTIPLE);
+        mGridView.setOnItemClickListener(mOnItemClickListener);
 
-            }
-        });
+        TextView emptyTextView = (TextView) findViewById(android.R.id.empty);
+        mGridView.setEmptyView(emptyTextView);
     }
 
     protected ListView getListView() {
@@ -74,7 +65,7 @@ public class EditFriendsActivity extends ActionBarActivity {
     protected ListAdapter getListAdapter() {
         ListAdapter adapter = getListView().getAdapter();
         if (adapter instanceof HeaderViewListAdapter) {
-            return ((HeaderViewListAdapter)adapter).getWrappedAdapter();
+            return ((HeaderViewListAdapter) adapter).getWrappedAdapter();
         } else {
             return adapter;
         }
@@ -101,10 +92,13 @@ public class EditFriendsActivity extends ActionBarActivity {
                     for (ParseUser user : mUsers) {
                         usernames[i] = user.getUsername();
                         i++;
-
                     }
-                    ArrayAdapter<String> adapter = new ArrayAdapter<String>(EditFriendsActivity.this, android.R.layout.simple_list_item_checked, usernames);
-                    getListView().setAdapter(adapter);
+                    if (mGridView.getAdapter() == null) {
+                        UserAdapter adapter = new UserAdapter(EditFriendsActivity.this, mUsers);
+                        mGridView.setAdapter(adapter);
+                    } else {
+                        ((UserAdapter) mGridView.getAdapter()).refill(mUsers);
+                    }
 
                     addFriendCheckMarks();
                 } else {
@@ -122,7 +116,7 @@ public class EditFriendsActivity extends ActionBarActivity {
     }
 
     private void addFriendCheckMarks() {
-        mFriendsRelation.getQuery().findInBackground( new FindCallback<ParseUser>() {
+        mFriendsRelation.getQuery().findInBackground(new FindCallback<ParseUser>() {
             @Override
             public void done(List<ParseUser> parseUsers, ParseException e) {
                 if (e == null) {
@@ -132,7 +126,7 @@ public class EditFriendsActivity extends ActionBarActivity {
 
                         for (ParseUser contact : parseUsers) {
                             if (contact.getObjectId().equals(user.getObjectId())) {
-                                getListView().setItemChecked(i, true);
+                                mGridView.setItemChecked(i, true);
 
                             }
                         }
@@ -158,4 +152,30 @@ public class EditFriendsActivity extends ActionBarActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
+    protected OnItemClickListener mOnItemClickListener = new OnItemClickListener() {
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            ImageView checkImageView = (ImageView) view.findViewById(R.id.checkImageView);
+
+            if (mGridView.isItemChecked(position)) {
+                //add friend
+                mFriendsRelation.add(mUsers.get(position));
+                checkImageView.setVisibility(View.VISIBLE);
+            } else {
+                //remove friend
+                mFriendsRelation.remove(mUsers.get(position));
+                checkImageView.setVisibility(View.INVISIBLE);
+            }
+
+            mCurrentUser.saveInBackground(new SaveCallback() {
+                @Override
+                public void done(ParseException e) {
+                    if (e == null) {
+                    }
+                }
+            });
+
+        }
+    };
 }
