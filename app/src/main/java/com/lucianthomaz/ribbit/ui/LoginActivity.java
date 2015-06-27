@@ -11,6 +11,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.lucianthomaz.ribbit.R;
+import com.lucianthomaz.ribbit.RibbitApplication;
 import com.parse.LogInCallback;
 import com.parse.ParseException;
 import com.parse.ParseUser;
@@ -66,8 +67,10 @@ public class LoginActivity extends ActionBarActivity {
                     ParseUser.logInInBackground(username, password, new LogInCallback() {
                         @Override
                         public void done(ParseUser user, ParseException e) {
-                            if (e == null){
+                            if (e == null) {
                                 // Success
+                                RibbitApplication.updateParseInstallation(user);
+
                                 Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
